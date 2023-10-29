@@ -90,14 +90,15 @@ print(n_labels)
 zero_case = np.where(n_labels==0)[0]
 zero_case = zero_case+1
 print('zero case:', zero_case)
+np.save('zero_case', zero_case)
 
 
-wrong_case.append(110)
+# wrong_case.append(110)
 wrong_case = np.unique(wrong_case)
 print('wrong_case:', wrong_case)
 
 print(zero_case.shape, wrong_case.shape)
-print(human_label[276])
+
 
 
 # correct_keys = [k for k in range(500) if k not in zero_case + wrong_case]
@@ -108,9 +109,6 @@ for k in range(1, 501):
 
 print(len(correct_keys))
 
-selected_keys = sorted(random.sample(correct_keys, 300))
-print(selected_keys)
-np.save('eval_keys', selected_keys)
 
 
 detection_label = {}
@@ -128,10 +126,16 @@ for label in correct_keys:
 
 print(len(detection_label))
 
-with open('human_detection', 'wb') as f:
+
+
+# selected_keys = sorted(random.sample(correct_keys, 300))
+# print(selected_keys)
+# np.save('eval_keys', selected_keys)
+
+with open('human_detection_all', 'wb') as f:
     pickle.dump(detection_label, f)
 
-with open('human_correction', 'wb') as f:
+with open('human_correction_all', 'wb') as f:
     pickle.dump(correction_label, f)
 
 
