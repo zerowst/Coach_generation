@@ -1,0 +1,11 @@
+human_label_data: 
+Human label related files including original conversation data.
+all_cases: conversation data of different parts.
+lingual_pos: Indexes of order of conversation and utterance position of lingual data within 300 samples.
+filtered_lingual_pos: Indexes of 176 samples. Human label extraction will use it.
+filtered_lingual_pos_relative: Relative indexes of 176 samples. BCOT samples extraction would use it.
+
+multi_prompt:
+coach_data: 
+Prompts of conversation data for all prompting methods.
+coach_gen:
