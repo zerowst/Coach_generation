@@ -7,9 +7,10 @@ import re
 from evaluate import load
 import jieba
 from Testing.annotation.metrics import qa_f1_zh_score, qa_f1_score, normalize_zh_answer, normalize_answer
+from Testing.multi_prompt.coach_gen.generate import load_input_file, process_input_file, generate_coach
 
 
-###----------------------------- generate detection and correction result based on coach sentence----------------------
+###----------------------------- generate detection and correction results based on coach sentence----------------------
 # vannila
 
 # det EM {'exact_match': 0.1859799713876967}
@@ -174,7 +175,7 @@ If no [Corrected Term] and [Incorrect Term] can be identified, format it as:
 coach sentence:
 """ + str(coach_sen) + \
 """
-\nShow me result directly without any other words"""
+\nShow me results directly without any other words"""
 
     return prompt
 
@@ -489,25 +490,35 @@ def lingual_evaluation(det_cor_dict, filename):
 
 
 
-if __name__ == '__main__':
-    ## 163
-    openai.api_key = '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'
-
-    FILENAME = 'icl'
-
-    FILE_PATH = '../generated_coach/' + FILENAME + '_generated.npy'
-    COACH_DIC = np.load(FILE_PATH, allow_pickle=True).item()
-
-    ### lingual
-    LINGUAL_DICT = det_cor_gen(coach_dict=COACH_DIC, filename=FILENAME)
-
-    lingual_evaluation(LINGUAL_DICT, filename=FILENAME)
-
-    ### nonlingual
-    NON_LINGUAL_DICT = non_lingual_filtering(coach_dict=COACH_DIC, filename=FILENAME)
-    non_lingual_evaluation(filter_result=NON_LINGUAL_DICT, filename=FILENAME)
-
-    exit()
+# if __name__ == '__main__':
+#     ## 163
+#     openai.api_key = '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'
+#
+#     FILENAME = 'hybrid.json'
+#
+#     SAVE_PATH = '../generated_coach/' + FILENAME + '_generated.npy'
+#     INPUT_FILE = '../coach_data/' + FILENAME + '_coach.csv'
+#     # INPUT_FILE = '../coach_data/cot_coach.csv'
+#
+#     input_list = load_input_file(INPUT_FILE)
+#
+#     input_dict = process_input_file(input_list)
+#
+#     generate_coach(input_dict, SAVE_PATH, name=FILENAME)
+#
+#     FILE_PATH = '../generated_coach/' + FILENAME + '_generated.npy'
+#     COACH_DIC = np.load(FILE_PATH, allow_pickle=True).item()
+#
+#     ### lingual
+#     LINGUAL_DICT = det_cor_gen(coach_dict=COACH_DIC, filename=FILENAME)
+#
+#     # lingual_evaluation(LINGUAL_DICT, filename=FILENAME)
+#
+#     ### nonlingual
+#     # NON_LINGUAL_DICT = non_lingual_filtering(coach_dict=COACH_DIC, filename=FILENAME)
+#     # non_lingual_evaluation(filter_result=NON_LINGUAL_DICT, filename=FILENAME)
+#
+#     exit()
 
 
 

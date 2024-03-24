@@ -219,7 +219,7 @@ Provided medical context:
 #     pickle.dump(disease_dict, f)
 
 
-# with open('coach_data/vannila_coach.csv', 'w', encoding='utf-8') as f:
+# with open('coach_data/vanilla_coach.csv', 'w', encoding='utf-8') as f:
 #     writer = csv.writer(f)
 #     writer.writerow(['input'])
 #     for c in changed_coach_input:
@@ -317,7 +317,7 @@ After steps 1 and 5, ensure placeholders (‘<>’) are replaced.
 Provide responses in Chinese."
 """
 
-### vannila COT  hybrid
+### vannila COT  hybrid.json
 vcot_prompt = """Act as a linguistic coach for a physician. Assess the doctor's statement: {doctor’s statement}  against a provided medical context: {medical context}  and guide the physician if discrepancies arise. 
 Your thought: the medical words in the statement are: xxxx.  By comparing xxx with the medical context,  if I find that xxx is not align with the {medical context}, since this is related to symptoms and it should be treated as incorrect symptoms, then I should check the corresponding accurate symptoms is ***. If I find that xxx is align with the {medical context}, then I should encourage the doctor and provide medical advice about xxx inside of the {doctor's statement}.
 So, your final response:  
@@ -352,7 +352,7 @@ Now assess the doctor's statement: {doctor’s statement}  against a provided me
 # vcot_coach_input = [replace_prompt(vcot_prompt, t) for t in coach_input]
 #
 #
-# with open('coach_data/vcot_coach.csv', 'w', encoding='utf-8') as f:
+# with open('coach_data/hybrid_coach.csv', 'w', encoding='utf-8') as f:
 #     writer = csv.writer(f)
 #     writer.writerow(['input'])
 #     for c in vcot_coach_input:
@@ -740,10 +740,120 @@ You will be given {Input}. Follow the above examples to provide your {thinking s
 
 
 
+### bcot_end_note new one
+prompt = """Given the doctor's statement and the medical context provided:
+
+Assess the Probability of Incorrect Terminology (P(Z₁)):
+
+Analyze the terms used in the doctor's statement.
+Estimate the probability that any given term is used incorrectly based on the medical context.
+List the terms along with their corresponding probability of being incorrect.
+Identify Specific Errors (P(Z₂|Z₁)):
+
+For terms with a high probability of being incorrect, identify the specific term(s) that are used inappropriately.
+Provide a brief explanation for each identified error, referencing the medical context.
+Determine Correction Requirement (P(Z₃|Z₂, Z₁)):
+
+Based on the errors identified, decide if a correction is needed for each term.
+For each term that requires correction, state the appropriate medical term that should be used.
+Evaluate Contextual Misalignment (P(Z₄|Z₃, Z₂, Z₁)):
+
+Judge how the incorrect use of terms affects the alignment of the doctor's statement with the medical context.
+Assess the impact of these errors on the overall understanding of the medical situation.
+Judge Diagnostic Accuracy (P(Z₅|Z₄, Z₃, Z₂, Z₁)):
+
+Consider the implications of terminology errors on the accuracy of the diagnosis presented by the doctor.
+Assess Treatment Suggestion Validity (P(Z₆|Z₅, Z₄, Z₃, Z₂, Z₁)):
+
+Evaluate whether the treatment suggested by the doctor is still valid despite the terminology errors.
+Determine Communication Clarity (P(Z₇|Z₆, Z₅, Z₄, Z₃, Z₂, Z₁)):
+
+Analyze how the clarity of communication is affected by the incorrect terminology.
+Estimate Potential for Misunderstanding (P(Z₈|Z₇, Z₆, Z₅, Z₄, Z₃, Z₂, Z₁)):
+
+Estimate the likelihood of misunderstanding or miscommunication due to the terminology errors.
+                                                                                                                                                                                                       
+For each step, provide your reasoning and the associated probabilities (give real numbers ranging from 0 to 1)  , if applicable, to mimic the process of Bayesian inference.                                        
+Conclude by generating the coach feedback (in Chinese) that assesses the doctor's statement against a provided medical \
+context and guides the physician by pointing out the particular medical terminology errors and providing the \
+corresponding corrections if discrepancies arise, if no mistakes occurred, then encouraging the doctor and provide \
+further medical advice.
+"""
+file = 'bcot_end'
+
+
+### bcot recap new one
+prompt = """Given the {doctor's statement} and the {medical context} provided:
+
+Assess the Probability of Incorrect Terminology (P(Z₁)):
+
+Analyze the medical terms used in the {doctor's statement}.
+Estimate the probability that any given medical term is used incorrectly based on the {medical context} which gives the information about the disease that the patient has been diagnosed with.
+List the medical terms along with their corresponding numerical probability of being incorrect.
+Identify Specific Errors (P(Z₂|Z₁)):
+
+For medical terms with a high probability of being incorrect, identify the specific term(s) that are used inappropriately.
+Provide a brief explanation for each identified error, referencing the {medical context}.
+List the incorrect medical terms along with their identified errors and numerical probability.
+Determine Correction Requirement (P(Z₃|Z₂, Z₁)):
+
+Based on the errors identified, decide if a correction is needed for each term.
+For each term that requires correction, state the appropriate medical term extracted from {medical context} that should be used.
+Evaluate Contextual Misalignment (P(Z₄|Z₃, Z₂, Z₁)):
+
+Judge how the incorrect use of medical terms affects the alignment of the doctor's statement with the {medical context}.
+List the incorrect medical terms along with their numerical probability of affecting alignment of {doctor’s statement}.
+Assess the impact of these errors on the overall understanding of the medical situation.
+Judge Diagnostic Accuracy (P(Z₅|Z₄, Z₃, Z₂, Z₁)):
+
+Consider the implications of terminology errors on the accuracy of the diagnosis presented by the doctor.
+Assess Treatment Suggestion Validity (P(Z₆|Z₅, Z₄, Z₃, Z₂, Z₁)):
+
+Evaluate whether the treatment suggested by the doctor is still valid despite the terminology errors.
+Determine Communication Clarity (P(Z₇|Z₆, Z₅, Z₄, Z₃, Z₂, Z₁)):
+
+Analyze how the clarity of communication is affected by the incorrect terminology.
+Estimate Potential for Misunderstanding (P(Z₈|Z₇, Z₆, Z₅, Z₄, Z₃, Z₂, Z₁)):
+
+Estimate the likelihood of misunderstanding or miscommunication due to the terminology errors.
+                                                                                                                                                                                                       
+For each step, provide your reasoning and the associated probabilities (give real numbers ranging from 0 to 1) , if applicable, to mimic the process of Bayesian inference.                                        
+Conclude by generating the coach feedback (in Chinese) that assesses the {doctor's statement} against a provided {medical context} following all above reasoning steps.
+If no mistakes occurred, then encouraging the doctor and provide further medical advice.
+If discrepancies arise, guides the physician by pointing out the particular medical terminology errors and providing the corresponding corrections. Make your coach feedback natural in conversation.
+
+"""
+file = 'bcot_recap_new'
+
+### bcot short delete irrelevant reasoning step, only detection and correction parts are left
+prompt = """Given the {doctor's statement} and the {medical context} provided:
+
+Assess the Probability of Incorrect Terminology (P(Z₁)):
+
+Analyze the medical terms used in the {doctor's statement}.
+Estimate the probability that any given medical term is used incorrectly based on the {medical context}. If medical term is irrelevant to {medical context} then it was considered incorrect.
+List the medical terms along with their corresponding numerical probability of being incorrect.
+Identify Specific Errors (P(Z₂|Z₁)):
+
+For medical terms with a high probability of being incorrect, identify the specific term(s) that are used inappropriately.
+Provide a brief explanation for each identified error, referencing the {medical context}.
+Determine Correction Requirement (P(Z₃|Z₂, Z₁)):
+
+Based on the errors identified, decide if a correction is needed for each term.
+For each term that requires correction, state the appropriate medical term extracted from {medical context} that should be used.
+
+For each step, provide your reasoning and the associated probabilities (give real numbers ranging from 0 to 1)  , if applicable, to mimic the process of Bayesian inference.       
+                                 
+Conclude by generating the coach feedback (in Chinese) that assesses the doctor's statement against a provided medical \
+context and guides the physician by pointing out the particular medical terminology errors and providing the corresponding \
+corrections if discrepancies arise, if no mistakes occurred, then encouraging the doctor and provide further medical advice.  \
+
+"""
+file = 'bcot_short'
+
+
 coach = [slot_replace_prompt(prompt, t) for t in coach_input]
 saving_file(coach, file)
-
-
 exit()
 
 

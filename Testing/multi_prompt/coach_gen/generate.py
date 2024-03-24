@@ -27,7 +27,7 @@ def gpt_call(prompt, retry=0):
                 {"role": "system", "content": ""},
                 {"role": "user", "content": prompt},
             ],
-            temperature=0.85
+            temperature=0
         )
         response = coach_response['choices'][0]['message']['content']
 
@@ -47,7 +47,7 @@ def gpt_icot(prompt, retry=0, regen=0):
                 {"role": "system", "content": ""},
                 {"role": "user", "content": prompt},
             ],
-            temperature=0.8
+            temperature=0
         )
         response = coach_response['choices'][0]['message']['content']
 
@@ -90,7 +90,7 @@ def process_input_file(input_file):
 
 
 def generate_coach(input_dict, saving_path, name):
-    if name == 'bcot':
+    if 'bcot_ori' in name:
         gpt = gpt_icot
     else:
         gpt = gpt_call
@@ -121,14 +121,11 @@ def generate_coach(input_dict, saving_path, name):
 
 
 if __name__ == '__main__':
-    ## 163 gcot
-    openai.api_key = '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'
-
-    ### jzc
-    # openai.api_key = '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'
+    ## 163
+    # openai.api_key = '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'
 
 
-    FILENAME = 'bcot'
+    FILENAME = 'cot2'
     SAVE_PATH = '../generated_coach/' + FILENAME + '_generated.npy'
     INPUT_FILE = '../coach_data/' + FILENAME + '_coach.csv'
     # INPUT_FILE = '../coach_data/cot_coach.csv'
@@ -137,7 +134,9 @@ if __name__ == '__main__':
 
     input_dict = process_input_file(input_list)
 
-    generate_coach(input_dict, SAVE_PATH, name='bcot')
+    generate_coach(input_dict, SAVE_PATH, name=FILENAME)
+
+
 
     exit()
 
